@@ -32,6 +32,9 @@ export class RegisterComponent {
     Validators.minLength(13),
     Validators.maxLength(13)
   ])
+  showAlert = false
+  alertMsg = 'Please wait! your account is being created'
+  alertColor = 'blue'
 
 
   registerForm = new FormGroup({
@@ -43,4 +46,9 @@ export class RegisterComponent {
     phoneNumber: this.phoneNumber
 
   })
+  register() {
+    this.showAlert = true
+    this.alertMsg = 'Please Wait! Your account is being created. '
+    this.alertColor = 'blue'
+  }
 }
