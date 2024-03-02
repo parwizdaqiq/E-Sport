@@ -18,12 +18,12 @@ import { VideoModule } from './video/video.module';
   ],
   imports: [
     BrowserModule,
-    AppRoutingModule,
     UserModule,
     AngularFireModule.initializeApp(environment.firebase),
     AngularFireAuthModule,
     AngularFirestoreModule,
-    VideoModule
+    VideoModule,
+    AppRoutingModule,
   ],
   providers: [],
   bootstrap: [AppComponent]
