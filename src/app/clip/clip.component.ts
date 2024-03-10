@@ -16,4 +16,5 @@ export class ClipComponent implements OnInit{
       this.id = params['id'] 
     })
   }
+
 }

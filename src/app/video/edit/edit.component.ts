@@ -1,7 +1,8 @@
-import { Component, OnInit, OnDestroy, Input, OnChanges } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input, OnChanges, Output, EventEmitter } from '@angular/core';
 import { ModalService } from 'src/app/services/modal.service';
 import IClip from 'src/app/models/clip.model';
 import { FormControl, FormGroup, Validator, Validators } from '@angular/forms';
+import { ClipService } from 'src/app/services/clip.service';
 
 @Component({
   selector: 'app-edit',
@@ -11,6 +12,11 @@ import { FormControl, FormGroup, Validator, Validators } from '@angular/forms';
 export class EditComponent implements OnInit, OnDestroy, OnChanges  {
   @Input() activeClip: IClip | null = null
   editForm: FormGroup; // Define the editForm property
+  inSubmission = false
+  showAlert = false
+  alertColor = 'blue'
+  alertMsg = 'Please Wait! Updating clip'
+  @Output () update = new EventEmitter()
 
   clipID = new FormControl('', {
     nonNullable: true
@@ -23,7 +29,10 @@ export class EditComponent implements OnInit, OnDestroy, OnChanges  {
     nonNullable: true
   })
 
-  constructor(private modal: ModalService) {
+  constructor(
+    private modal: ModalService,
+    private ClipService: ClipService
+    ) {
     this.editForm = new FormGroup({ // Initialize editForm in the constructor
       clipID: this.clipID,
       title: this.title
@@ -43,7 +52,40 @@ export class EditComponent implements OnInit, OnDestroy, OnChanges  {
       return
     }
 
+    this.inSubmission = false
+    this.showAlert = false
     this.clipID.setValue(this.activeClip.docID ?? '')
     this.title.setValue(this.activeClip.title)
+  }
+
+  async submit() {
+    if(!this.activeClip) {
+      return
+    }
+
+    this.inSubmission = true
+    this.showAlert = true
+    this.alertColor = 'blue'
+    this.alertMsg = 'Please Wait! Updating Clip'
+
+    try {
+      await this.ClipService.updateClip(
+        this.clipID.value, this.title.value
+      )
+    }
+
+    catch(e) {
+      this.inSubmission = false
+      this.alertColor = 'red'
+      this.alertMsg = 'Something went wrong. Try again later'
+      return
+    }
+
+    this.activeClip.title = this.title.value
+    this.update.emit(this.activeClip)
+
+    this.inSubmission = false
+    this.alertColor = 'green'
+    this.alertMsg = 'Success'
   }
 }
